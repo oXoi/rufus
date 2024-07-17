@@ -36,6 +36,7 @@
 #define MB                          1048576LL
 #define GB                          1073741824LL
 #define TB                          1099511627776LL
+#define PB                          1125899906842624LL
 
 /*
  * Features not ready for prime time and that may *DESTROY* your data - USE AT YOUR OWN RISKS!
@@ -186,6 +187,7 @@ static __inline void static_repchr(char* p, char s, char r) {
 }
 #define to_unix_path(str) static_repchr(str, '\\', '/')
 #define to_windows_path(str) static_repchr(str, '/', '\\')
+#define if_not_assert(cond) assert(cond); if (!(cond))
 
 extern void uprintf(const char *format, ...);
 extern void uprintfs(const char *str);
@@ -627,7 +629,7 @@ typedef struct {
 
 #define UNATTEND_WINPE_SETUP_MASK           (UNATTEND_SECUREBOOT_TPM_MINRAM)
 #define UNATTEND_SPECIALIZE_DEPLOYMENT_MASK (UNATTEND_NO_ONLINE_ACCOUNT)
-#define UNATTEND_OOBE_SHELL_SETUP_MASK      (UNATTEND_NO_DATA_COLLECTION | UNATTEND_SET_USER)
+#define UNATTEND_OOBE_SHELL_SETUP_MASK      (UNATTEND_NO_DATA_COLLECTION | UNATTEND_SET_USER | UNATTEND_DUPLICATE_LOCALE)
 #define UNATTEND_OOBE_INTERNATIONAL_MASK    (UNATTEND_DUPLICATE_LOCALE)
 #define UNATTEND_OOBE_MASK                  (UNATTEND_OOBE_SHELL_SETUP_MASK | UNATTEND_OOBE_INTERNATIONAL_MASK | UNATTEND_DISABLE_BITLOCKER)
 #define UNATTEND_OFFLINE_SERVICING_MASK     (UNATTEND_OFFLINE_INTERNAL_DRIVES | UNATTEND_FORCE_S_MODE)

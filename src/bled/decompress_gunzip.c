@@ -276,7 +276,15 @@ static unsigned fill_bitbuffer(STATE_PARAM unsigned bitbuffer, unsigned *current
 			bytebuffer_size += 4;
 			bytebuffer_offset = 4;
 		}
-		bitbuffer |= ((unsigned) bytebuffer[bytebuffer_offset]) << *current;
+
+		uint64_t bbf = (uint64_t)bytebuffer[bytebuffer_offset];
+		bbf <<= *current;
+		assert(bbf < UINT32_MAX);
+		if (bbf >= UINT32_MAX) {
+			error_msg = "overflow";
+			abort_unzip(PASS_STATE_ONLY);
+		}
+		bitbuffer |= (unsigned) bbf;
 		bytebuffer_offset++;
 		*current += 8;
 	}
@@ -661,7 +669,7 @@ static NOINLINE int inflate_codes(STATE_PARAM_ONLY)
 
 
 /* called once from inflate_block */
-static void inflate_stored_setup(STATE_PARAM int my_n, int my_b, int my_k)
+static void inflate_stored_setup(STATE_PARAM unsigned my_n, unsigned my_b, unsigned my_k)
 {
 	inflate_stored_n = my_n;
 	inflate_stored_b = my_b;
@@ -1038,7 +1046,8 @@ inflate_unzip_internal(STATE_PARAM transformer_state_t *xstate)
 	while (1) {
 		int r = inflate_get_next_window(PASS_STATE_ONLY);
 		nwrote = transformer_write(xstate, gunzip_window, gunzip_outbuf_count);
-		if (nwrote != (ssize_t)gunzip_outbuf_count) {
+		// Coverity is dumb...
+		if (nwrote < 0 || nwrote != (ssize_t)gunzip_outbuf_count || nwrote > INT32_MAX) {
 			huft_free_all(PASS_STATE_ONLY);
 			n = (nwrote <0)?nwrote:-1;
 			goto ret;
