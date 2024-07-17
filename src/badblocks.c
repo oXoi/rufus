@@ -426,6 +426,11 @@ static unsigned int test_rw(HANDLE hDrive, blk64_t last_block, size_t block_size
 		cancel_ops = -1;
 		return 0;
 	}
+	if ((last_block * block_size) > 1 * PB) {
+		uprintf("%sDisk is too large\n", bb_prefix);
+		cancel_ops = -1;
+		return 0;
+	}
 
 	buffer = allocate_buffer(2 * blocks_at_once * block_size);
 	if (!buffer) {
